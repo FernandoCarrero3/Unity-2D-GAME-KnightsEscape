@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour
     private float nextAttackTime = 0f;  // Cuándo podremos volver a atacar
 
     [Header("Salud")]
-    public int maxHealth = 3;
+    public int maxHealth = 150;
     public int currentHealth;
     private bool isDead = false;
 
@@ -112,11 +112,10 @@ public class PlayerController : MonoBehaviour
         if (isDead) return;
 
         currentHealth -= damageAmount;
-        Debug.Log("¡Ay! Vidas restantes: " + currentHealth);
 
         if (hudManager != null)
         {
-            hudManager.ActualizarVidas(currentHealth);
+            hudManager.ActualizarVidas(currentHealth, maxHealth);
         }
 
         if (currentHealth > 0)

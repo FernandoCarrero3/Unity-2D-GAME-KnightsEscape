@@ -20,6 +20,7 @@ public class EnemyAI : MonoBehaviour
     public float attackRadius = 1.5f; 
     public float attackCooldown = 1.5f; 
     private float nextAttackTime = 0f;
+    public int attackDamage = 35;
 
     [Header("Sensores")]
     public Transform groundCheck;
@@ -108,12 +109,9 @@ public class EnemyAI : MonoBehaviour
 
         if (Time.time >= nextAttackTime)
         {
-            // <-- 4. ACTIVAR EL TRIGGER DE ATAQUE EN EL ANIMATOR -->
             anim.SetTrigger("Attack");
-            
-            // Debug.Log("¡El cerdo ataca al caballero!");
 
-            player.GetComponent<PlayerController>().TakeDamage(1);
+            player.GetComponent<PlayerController>().TakeDamage(attackDamage);
             
             nextAttackTime = Time.time + attackCooldown; 
         }
