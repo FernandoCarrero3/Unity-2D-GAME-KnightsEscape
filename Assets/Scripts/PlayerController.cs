@@ -42,6 +42,11 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        int saludGuardada = PlayerPrefs.GetInt("MaxHealth", 150); 
+
+        maxHealth = saludGuardada;
+        currentHealth = maxHealth;
+
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();

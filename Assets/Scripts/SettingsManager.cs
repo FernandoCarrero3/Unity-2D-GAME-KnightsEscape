@@ -8,11 +8,9 @@ public class SettingsManager : MonoBehaviour
     [Header("Volumen")]
     public Slider volumeSlider;
 
-    [Header("Vidas")]
-    public TextMeshProUGUI livesLabel;
-    private int lives = 3;
-    private int minLives = 1;
-    private int maxLives = 5;
+    [Header("Salud (Sustituye a Vidas)")]
+    public Slider healthSlider;
+    public TextMeshProUGUI healthLabel;
 
     [Header("Dificultad")]
     public TextMeshProUGUI difficultyLabel;
@@ -21,36 +19,40 @@ public class SettingsManager : MonoBehaviour
 
     void Start()
     {
-        // Cargar valores guardados
+        // 1. Cargar valores guardados (con valores por defecto si es la primera vez)
         volumeSlider.value = PlayerPrefs.GetFloat("Volume", 1f);
-        lives = PlayerPrefs.GetInt("Lives", 3);
+        healthSlider.value = PlayerPrefs.GetInt("MaxHealth", 150); // 150 HP por defecto
         difficultyIndex = PlayerPrefs.GetInt("DifficultyIndex", 1);
 
-        // Actualizar UI
-        UpdateLivesLabel();
+        // 2. Aplicar el volumen inicial al juego
+        AudioListener.volume = volumeSlider.value;
+
+        // 3. Actualizar los textos de la UI
+        UpdateHealthLabel(healthSlider.value);
         UpdateDifficultyLabel();
     }
 
-    public void OnVolumeChanged()
+    // --- VOLUMEN ---
+    public void OnVolumeChanged(float value)
     {
-        PlayerPrefs.SetFloat("Volume", volumeSlider.value);
-        AudioListener.volume = volumeSlider.value;
+        PlayerPrefs.SetFloat("Volume", value);
+        AudioListener.volume = value;
     }
 
-    public void IncreaseLives()
+    // --- SALUD ---
+    public void OnHealthChanged(float value)
     {
-        if (lives < maxLives) lives++;
-        PlayerPrefs.SetInt("Lives", lives);
-        UpdateLivesLabel();
+        int maxHealth = Mathf.RoundToInt(value);
+        PlayerPrefs.SetInt("MaxHealth", maxHealth);
+        UpdateHealthLabel(maxHealth);
     }
 
-    public void DecreaseLives()
+    private void UpdateHealthLabel(float value)
     {
-        if (lives > minLives) lives--;
-        PlayerPrefs.SetInt("Lives", lives);
-        UpdateLivesLabel();
+        healthLabel.text = "Salud Máx: " + Mathf.RoundToInt(value);
     }
 
+    // --- DIFICULTAD (Oculta en UI, pero funcional en código) ---
     public void ChangeDifficulty()
     {
         difficultyIndex = (difficultyIndex + 1) % difficulties.Length;
@@ -58,16 +60,16 @@ public class SettingsManager : MonoBehaviour
         UpdateDifficultyLabel();
     }
 
-    private void UpdateLivesLabel()
-    {
-        livesLabel.text = "Vidas: " + lives;
-    }
-
     private void UpdateDifficultyLabel()
     {
-        difficultyLabel.text = difficulties[difficultyIndex];
+        // Añadimos esta comprobación por si decides borrar o desactivar el texto en Unity
+        if (difficultyLabel != null) 
+        {
+            difficultyLabel.text = difficulties[difficultyIndex];
+        }
     }
 
+    // --- NAVEGACIÓN ---
     public void GoBack()
     {
         PlayerPrefs.Save();
