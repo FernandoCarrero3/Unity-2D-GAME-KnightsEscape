@@ -3,39 +3,45 @@ using UnityEngine;
 public class EnemyAI : MonoBehaviour
 {
     public enum EnemyState { Patrullar, Perseguir, Atacar }
-    
+
     [Header("Estado Actual")]
     public EnemyState currentState = EnemyState.Patrullar;
 
     [Header("Ajustes de Patrulla")]
     public float moveSpeed = 2f;
-    private bool movingRight = false; 
+    private bool movingRight = false;
 
     [Header("Visión y Persecución")]
-    public float visionRadius = 5f;  
-    public float chaseSpeed = 3.5f;  
+    public float visionRadius = 5f;
+    public float chaseSpeed = 3.5f;
     private Transform player;
 
     [Header("Ataque")]
-    public float attackRadius = 1.5f; 
-    public float attackCooldown = 1.5f; 
+    public float attackRadius = 1.5f;
+    public float attackCooldown = 1.5f;
     private float nextAttackTime = 0f;
     public int attackDamage = 35;
 
     [Header("Sensores")]
     public Transform groundCheck;
-    public Transform wallCheck; 
+    public Transform wallCheck;
     public float checkRadius = 0.1f;
     public LayerMask groundLayer;
 
     private Rigidbody2D rb;
-    private Animator anim; // <-- 1. REFERENCIA AL ANIMATOR
+    private Animator anim;
+
+    [Header("Salud del Enemigo")]
+    public int maxHealth = 100;
+    private int currentHealth;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        anim = GetComponent<Animator>(); // <-- 2. OBTENER EL ANIMATOR
+        anim = GetComponent<Animator>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
+
+        currentHealth = maxHealth;
     }
 
     void Update()
@@ -88,7 +94,7 @@ public class EnemyAI : MonoBehaviour
         else if (directionX < 0 && movingRight) Flip();
 
         bool isGroundAhead = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
-        if (!isGroundAhead) rb.linearVelocity = new Vector2(0, rb.linearVelocity.y); 
+        if (!isGroundAhead) rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
     }
 
     void Flip()
@@ -112,8 +118,45 @@ public class EnemyAI : MonoBehaviour
             anim.SetTrigger("Attack");
 
             player.GetComponent<PlayerController>().TakeDamage(attackDamage);
-            
-            nextAttackTime = Time.time + attackCooldown; 
+
+            nextAttackTime = Time.time + attackCooldown;
         }
+    }
+
+    private bool yaEstaMuerto = false;
+
+    public void TakeDamage(int damage)
+    {
+        
+        if (yaEstaMuerto) return;
+
+        currentHealth -= damage;
+
+        if (currentHealth > 0)
+        {
+            anim.SetTrigger("Hit");
+        }
+        else
+        {
+            yaEstaMuerto = true;
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        Debug.Log("¡El cerdo ha muerto!");
+
+        // Reproduce la animación de morir (trigger "Dead")
+        anim.SetTrigger("Dead");
+
+        rb.bodyType = RigidbodyType2D.Static;
+        // Desactivamos el collider para que el cadáver no estorbe ni nos empuje
+        GetComponent<Collider2D>().enabled = false;
+
+        FindObjectOfType<HUDManager>().SumarPuntos(100);
+
+        // Desactivamos este script para que deje de perseguirnos y atacar estando muerto
+        this.enabled = false;
     }
 }

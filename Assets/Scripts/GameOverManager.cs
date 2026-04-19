@@ -1,49 +1,64 @@
 using UnityEngine;
+using TMPro; // Para los textos
+using UnityEngine.SceneManagement; // Para cambiar de escena
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
-using TMPro;
 
 public class GameOverManager : MonoBehaviour
 {
-    [Header("UI")]
-    public TextMeshProUGUI scoreText;
-    public TMP_InputField nameInputField;
+    [Header("Elementos de la UI")]
+    public TextMeshProUGUI textoPuntuacion;
+    public TMP_InputField inputNombre; // <-- La caja donde el jugador escribe
 
-    private int finalScore = 0;
+    public RawImage fondoCaptura; 
+    public static Texture2D capturaDePantalla; // Variable estática que sobrevive entre escenas
+
+    private int puntosObtenidos = 0;
 
     void Start()
     {
-        // Recoger la puntuación de la partida anterior
-        finalScore = PlayerPrefs.GetInt("LastScore", 0);
-        scoreText.text = "Puntuación: " + finalScore;
+        // 1. Recuperamos los puntos que guardó el HUD al morir
+        puntosObtenidos = PlayerPrefs.GetInt("PuntuacionActual", 0);
+        
+        // 2. Lo mostramos en tu texto
+        textoPuntuacion.text = "Puntuación: " + puntosObtenidos.ToString();
 
-        // Guardar record si es el más alto
-        int highScore = PlayerPrefs.GetInt("HighScore", 0);
-        if (finalScore > highScore)
+        if (capturaDePantalla != null)
         {
-            PlayerPrefs.SetInt("HighScore", finalScore);
+            fondoCaptura.texture = capturaDePantalla;
         }
     }
 
-    public void SaveScoreAndRestart()
+    // Método general que usarán ambos botones para guardar el nombre antes de irse
+    private void GuardarRecordYSalir(string nombreDeLaSiguienteEscena)
     {
-        SavePlayerName();
-        SceneManager.LoadScene("GameScene");
-    }
+        // 1. Cogemos lo que el jugador haya escrito
+        string nombreJugador = inputNombre.text;
 
-    public void SaveScoreAndGoMenu()
-    {
-        SavePlayerName();
-        SceneManager.LoadScene("MainMenu");
-    }
-
-    private void SavePlayerName()
-    {
-        string playerName = nameInputField.text;
-        if (playerName != "")
+        // Si le da al botón sin escribir nada, le ponemos un nombre por defecto
+        if (string.IsNullOrEmpty(nombreJugador))
         {
-            PlayerPrefs.SetString("PlayerName", playerName);
-            PlayerPrefs.Save();
+            nombreJugador = "Caballero Anónimo";
         }
+
+        // 2. Guardamos el nombre y los puntos en memoria (¡Esto será la base para el Top 10!)
+        PlayerPrefs.SetString("UltimoNombre", nombreJugador);
+        PlayerPrefs.Save();
+
+        // 3. Cambiamos de escena
+        SceneManager.LoadScene(nombreDeLaSiguienteEscena);
+    }
+
+    // --- MÉTODOS PARA LOS BOTONES ---
+
+    public void BotonReiniciar()
+    {
+        // Vuelve a la escena del juego (Asegúrate de que se llama exactamente "GameScene")
+        GuardarRecordYSalir("GameScene");
+    }
+
+    public void BotonMenuPrincipal()
+    {
+        // Va al menú principal (Pon el nombre exacto de tu escena de menú aquí)
+        GuardarRecordYSalir("RecordsScene"); 
     }
 }

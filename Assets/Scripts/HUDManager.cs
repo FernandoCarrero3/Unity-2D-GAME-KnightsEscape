@@ -1,6 +1,6 @@
 using UnityEngine;
-using UnityEngine.UI; 
-using TMPro; 
+using UnityEngine.UI;
+using TMPro;
 
 public class HUDManager : MonoBehaviour
 {
@@ -11,10 +11,14 @@ public class HUDManager : MonoBehaviour
     public TextMeshProUGUI textoTiempo;
     private float tiempoJugado = 0f;
 
+    [Header("Puntuación")]
+    public TextMeshProUGUI textoPuntos;
+    private int puntosTotales = 0;
+
     void Update()
     {
         // Cronómetro
-        tiempoJugado += Time.deltaTime; 
+        tiempoJugado += Time.deltaTime;
         int minutos = Mathf.FloorToInt(tiempoJugado / 60);
         int segundos = Mathf.FloorToInt(tiempoJugado % 60);
         textoTiempo.text = string.Format("{0:00}:{1:00}", minutos, segundos);
@@ -26,8 +30,21 @@ public class HUDManager : MonoBehaviour
         // Calculamos el porcentaje de vida (de 0.0 a 1.0)
         // Usamos (float) para que la división tenga decimales
         float porcentaje = (float)vidaActual / (float)vidaMaxima;
-        
+
         // Aplicamos el porcentaje al "Fill Amount" de la imagen
         rellenoVida.fillAmount = porcentaje;
+    }
+
+    public void SumarPuntos(int cantidad)
+    {
+        puntosTotales += cantidad;
+        textoPuntos.text = "Puntos: " + puntosTotales.ToString("0000");
+    }
+    public void GuardarPuntuacionFinal()
+    {
+        // Guardamos los puntos bajo el nombre "PuntuacionActual"
+        PlayerPrefs.SetInt("PuntuacionActual", puntosTotales);
+        PlayerPrefs.Save();
+        Debug.Log("Puntuación de " + puntosTotales + " guardada correctamente.");
     }
 }
