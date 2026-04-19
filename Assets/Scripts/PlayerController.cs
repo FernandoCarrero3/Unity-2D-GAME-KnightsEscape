@@ -40,6 +40,13 @@ public class PlayerController : MonoBehaviour
     public LayerMask enemyLayers; // Para saber qué cosas son enemigos
     public int attackDamage = 50; // El daño de la espada
 
+    // Añade esto arriba con el resto de tus variables
+    [Header("Efectos de Sonido")]
+    public AudioClip sonidoEspada;
+    public AudioClip sonidoDaño;
+    public AudioClip sonidoMuerte;
+    private AudioSource audioSourceSFX;
+
     void Start()
     {
         int saludGuardada = PlayerPrefs.GetInt("MaxHealth", 150); 
@@ -52,6 +59,8 @@ public class PlayerController : MonoBehaviour
         anim = GetComponent<Animator>();
 
         currentHealth = maxHealth;
+
+        audioSourceSFX = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -88,6 +97,8 @@ public class PlayerController : MonoBehaviour
             }
 
             anim.SetTrigger("Attack" + comboStep);
+
+            audioSourceSFX.PlayOneShot(sonidoEspada);
 
             // --- DETECTAR Y DAÑAR ENEMIGOS ---
             // 1. Crea la esfera invisible y guarda a todos los enemigos que toque
@@ -143,6 +154,7 @@ public class PlayerController : MonoBehaviour
         if (currentHealth > 0)
         {
             anim.SetTrigger("Hurt"); // Reproduce la animación de daño
+            audioSourceSFX.PlayOneShot(sonidoDaño);
         }
         else
         {
@@ -158,6 +170,8 @@ public class PlayerController : MonoBehaviour
         // Congelamos al personaje
         rb.bodyType = RigidbodyType2D.Static;
         GetComponent<Collider2D>().enabled = false;
+
+        audioSourceSFX.PlayOneShot(sonidoMuerte);
 
         Debug.Log("¡El caballero ha muerto! Saltando a Game Over...");
 

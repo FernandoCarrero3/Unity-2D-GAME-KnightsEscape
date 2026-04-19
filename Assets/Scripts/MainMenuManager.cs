@@ -5,7 +5,16 @@ public class MainMenuManager : MonoBehaviour
 {
     public void PlayGame()
     {
-        SceneManager.LoadScene("GameScene");
+        // En lugar de cargar la escena de golpe, buscamos al MusicManager y le decimos que haga el Fade Out
+        if (MusicManager.instance != null)
+        {
+            MusicManager.instance.EmpezarJuegoConFadeOut();
+        }
+        else
+        {
+            // Por si acaso probamos el juego sin música, cargamos normal
+            SceneManager.LoadScene("GameScene");
+        }
     }
 
     public void OpenSettings()

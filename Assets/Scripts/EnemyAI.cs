@@ -35,6 +35,10 @@ public class EnemyAI : MonoBehaviour
     public int maxHealth = 100;
     private int currentHealth;
 
+    [Header("Efectos de Sonido")]
+    public AudioClip sonidoDañoCerdo;
+    private AudioSource audioSourceEnemigo;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -42,6 +46,8 @@ public class EnemyAI : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").transform;
 
         currentHealth = maxHealth;
+
+        audioSourceEnemigo = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -127,7 +133,7 @@ public class EnemyAI : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        
+
         if (yaEstaMuerto) return;
 
         currentHealth -= damage;
@@ -135,6 +141,11 @@ public class EnemyAI : MonoBehaviour
         if (currentHealth > 0)
         {
             anim.SetTrigger("Hit");
+
+            if (audioSourceEnemigo != null && sonidoDañoCerdo != null)
+            {
+                audioSourceEnemigo.PlayOneShot(sonidoDañoCerdo);
+            }
         }
         else
         {
