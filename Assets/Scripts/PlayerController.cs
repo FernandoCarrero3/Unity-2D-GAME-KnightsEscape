@@ -49,6 +49,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        PlayerPrefs.SetInt("PuntuacionActual", 0);
         int saludGuardada = PlayerPrefs.GetInt("MaxHealth", 150); 
 
         maxHealth = saludGuardada;
