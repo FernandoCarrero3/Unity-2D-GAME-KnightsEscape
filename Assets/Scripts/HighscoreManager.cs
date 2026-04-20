@@ -78,7 +78,6 @@ public class HighscoreManager : MonoBehaviour
 
     public void BotonVolver()
     {
-        // De momento volvemos al juego para probar rápido (luego lo cambiaremos al Menú Principal)
-        SceneManager.LoadScene("MainMenu"); 
+        GestorTransiciones.instancia.CargarEscena("MainMenu");
     }
 }

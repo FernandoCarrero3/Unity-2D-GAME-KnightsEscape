@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class EnemyAI : MonoBehaviour
 {
@@ -30,6 +31,11 @@ public class EnemyAI : MonoBehaviour
 
     private Rigidbody2D rb;
     private Animator anim;
+
+    [Header("Retroceso (Knockback)")]
+    public float fuerzaGolpeX = 3f; // Fuerza hacia atrás
+    public float fuerzaGolpeY = 4f; // Fuerza del saltito hacia arriba
+    public float tiempoAturdido = 0.3f; // Tiempo que el cerdo no puede moverse
 
     [Header("Salud del Enemigo")]
     public int maxHealth = 100;
@@ -142,6 +148,8 @@ public class EnemyAI : MonoBehaviour
         {
             anim.SetTrigger("Hit");
 
+            StartCoroutine(RutinaRetroceso());
+
             if (audioSourceEnemigo != null && sonidoDañoCerdo != null)
             {
                 audioSourceEnemigo.PlayOneShot(sonidoDañoCerdo);
@@ -169,5 +177,33 @@ public class EnemyAI : MonoBehaviour
 
         // Desactivamos este script para que deje de perseguirnos y atacar estando muerto
         this.enabled = false;
+    }
+
+    private IEnumerator RutinaRetroceso()
+    {
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+        if (rb != null && player != null)
+        {
+            // 1. Calculamos desde dónde nos ha pegado el jugador
+            // Si el jugador está más a la derecha, el cerdo sale volando a la izquierda (-1), y viceversa.
+            float direccion = transform.position.x < player.transform.position.x ? -1f : 1f;
+
+            // 2. Frenamos al cerdo en seco por si venía corriendo
+            rb.linearVelocity = Vector2.zero;
+
+            // 3. Le damos el empujón físico hacia atrás y hacia arriba (Impulso)
+            rb.AddForce(new Vector2(fuerzaGolpeX * direccion, fuerzaGolpeY), ForceMode2D.Impulse);
+
+            // 4. Pausamos su inteligencia artificial (este mismo script) para que no camine en el aire
+            this.enabled = false;
+
+            // 5. Esperamos a que caiga al suelo (aturdido)
+            yield return new WaitForSeconds(tiempoAturdido);
+
+            // 6. Le devolvemos la consciencia para que vuelva a atacar
+            this.enabled = true;
+        }
     }
 }

@@ -58,6 +58,7 @@ public class PauseManager : MonoBehaviour
         // Guardamos los puntos conseguidos hasta ahora por si acaso
         PlayerPrefs.Save(); 
         
-        SceneManager.LoadScene("MainMenu");
+        GestorTransiciones.instancia.CargarEscena("MainMenu");
+        
     }
 }

@@ -73,6 +73,6 @@ public class SettingsManager : MonoBehaviour
     public void GoBack()
     {
         PlayerPrefs.Save();
-        SceneManager.LoadScene("MainMenu");
+        GestorTransiciones.instancia.CargarEscena("MainMenu");
     }
 }

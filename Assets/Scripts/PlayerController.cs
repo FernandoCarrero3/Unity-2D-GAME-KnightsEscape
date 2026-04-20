@@ -8,6 +8,24 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 8f;
     public float jumpForce = 16f;
 
+    [Header("Wall Slide")]
+    public Transform wallCheck;
+    public LayerMask wallLayer;
+    public float wallSlidingSpeed = 2f; // Velocidad lenta a la que cae rozando la pared
+    private bool isWallSliding;
+
+    [Header("Parkour - Wall Jump")]
+    public Vector2 wallJumpForce = new Vector2(7f, 12f);
+    public float wallJumpDuration = 0.3f; // Tiempo que pierdes el control al rebotar
+    private bool isWallJumping;
+
+    [Header("Rodar (Roll)")]
+    public float rollSpeed = 8f; // Velocidad del impulso
+    public float rollTime = 0.4f; // Cuánto dura la voltereta
+    public float rollCooldown = 1f; // Tiempo de espera para volver a rodar
+    private bool isRolling;
+    private bool canRoll = true;
+
     [Header("Ground Check")]
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
@@ -50,7 +68,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         PlayerPrefs.SetInt("PuntuacionActual", 0);
-        int saludGuardada = PlayerPrefs.GetInt("MaxHealth", 150); 
+        int saludGuardada = PlayerPrefs.GetInt("MaxHealth", 150);
 
         maxHealth = saludGuardada;
         currentHealth = maxHealth;
@@ -68,13 +86,38 @@ public class PlayerController : MonoBehaviour
     {
         if (isDead) return;
 
+        // Si el personaje está rodando, no le dejamos caminar, atacar ni saltar
+        if (isRolling)
+        {
+            return;
+        }
+
+        if (isWallJumping)
+        {
+            return;
+        }
+
+        // Detectar si pulsamos el botón de rodar (Shift izquierdo por ejemplo)
+        if (Input.GetKeyDown(KeyCode.LeftShift) && canRoll)
+        {
+            StartCoroutine(RutinaRodar());
+        }
+
         // Movimiento horizontal
         moveInput = Input.GetAxisRaw("Horizontal");
 
         // Salto
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if ((Input.GetButtonDown("Jump") && isGrounded) || Input.GetKeyDown(KeyCode.Space))
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            if (isGrounded)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            }
+            else if (isWallSliding) // ¡NUEVO! Si estamos pegados a una pared...
+            {
+                EjecutarWallJump();
+            }
+
         }
 
         // --- SISTEMA DE COMBOS ---
@@ -117,14 +160,22 @@ public class PlayerController : MonoBehaviour
         }
         // -------------------------
 
-        // Girar sprite según dirección
-        if (moveInput > 0) spriteRenderer.flipX = false;
-        else if (moveInput < 0) spriteRenderer.flipX = true;
+        // Girar sprite y las colisiones según dirección
+        if (moveInput > 0)
+        {
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+        else if (moveInput < 0)
+        {
+            transform.localScale = new Vector3(-1, 1, 1);
+        }
 
         // <-- 3. Actualizar parámetros del Animator -->
         anim.SetFloat("Speed", Mathf.Abs(moveInput));
         anim.SetFloat("yVelocity", rb.linearVelocity.y);
         anim.SetBool("IsGrounded", isGrounded);
+
+        ComprobarWallSlide();
     }
 
     void FixedUpdate()
@@ -137,8 +188,10 @@ public class PlayerController : MonoBehaviour
             groundLayer
         );
 
-        // Aplicar movimiento
-        rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
+        if (!isWallJumping && !isRolling)
+        {
+            rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
+        }
     }
 
     public void TakeDamage(int damageAmount)
@@ -200,5 +253,107 @@ public class PlayerController : MonoBehaviour
 
         // 4. Cambiamos de escena
         SceneManager.LoadScene("GameOver");
+    }
+
+    // --- LÓGICA DEL WALL SLIDE ---
+    private bool TocandoPared()
+    {
+        // Crea un pequeño círculo en el WallCheck. Si toca la capa 'wallLayer', devuelve true.
+        return Physics2D.OverlapCircle(wallCheck.position, 0.3f, wallLayer);
+    }
+
+    private void ComprobarWallSlide()
+    {
+        // Si tocamos pared, NO estamos tocando el suelo, y estamos pulsando hacia los lados...
+        if (TocandoPared() && !isGrounded && Input.GetAxisRaw("Horizontal") != 0)
+        {
+            if (isWallJumping) return;
+            isWallSliding = true;
+            // Frenamos su caída para que resbale despacito
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Clamp(rb.linearVelocity.y, -wallSlidingSpeed, float.MaxValue));
+
+            // Activamos animación de Wall Slide
+            anim.SetBool("WallSlide", true);
+        }
+        else
+        {
+            isWallSliding = false;
+            anim.SetBool("WallSlide", false);
+        }
+    }
+
+    // (Opcional pero recomendado): Si usas una función para saber si tocas el suelo, asegúrate de tenerla.
+    // Suele ser algo así: 
+    // private bool TocandoSuelo() { return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer); }
+
+    // --- LÓGICA DE RODAR (ROLL) ---
+    private IEnumerator RutinaRodar()
+    {
+        canRoll = false;
+        isRolling = true;
+
+        // Disparamos la animación
+        anim.SetTrigger("Roll");
+
+        // Guardamos la gravedad original y la ponemos a 0 para que no caiga mientras rueda
+        float gravedadOriginal = rb.gravityScale;
+        rb.gravityScale = 0f;
+
+        // Averiguamos hacia dónde mira (1 = derecha, -1 = izquierda)
+        float direccionX = Mathf.Sign(transform.localScale.x);
+
+        // Le damos el empujón
+        rb.linearVelocity = new Vector2(direccionX * rollSpeed, 0f);
+
+        // Esperamos lo que dure la voltereta
+        yield return new WaitForSeconds(rollTime);
+
+        // Restauramos todo
+        rb.gravityScale = gravedadOriginal;
+        isRolling = false;
+
+        // Esperamos el cooldown para poder volver a rodar
+        yield return new WaitForSeconds(rollCooldown);
+        canRoll = true;
+    }
+
+    // Función vacía para evitar el error de la animación de polvo del Asset
+    public void AE_SlideDust()
+    {
+        // En el futuro podemos poner aquí un código para que salgan partículas
+    }
+
+    private void EjecutarWallJump()
+    {
+        StartCoroutine(RutinaWallJump());
+    }
+
+    private IEnumerator RutinaWallJump()
+    {
+        // 1. Activamos el modo salto y soltamos la pared
+        isWallJumping = true;
+        isWallSliding = false;
+        anim.SetBool("WallSlide", false);
+
+        // 2. Averiguamos hacia dónde mira ahora mismo
+        float direccionX = Mathf.Sign(transform.localScale.x);
+
+        // 3. Saltamos hacia el lado CONTRARIO
+        float direccionSalto = -direccionX;
+
+        // 4. Giramos al personaje a la fuerza para que mire a donde salta
+        transform.localScale = new Vector3(direccionSalto, 1, 1);
+
+        // 5. ¡Vaciamos la velocidad actual antes de empujar! (Súper importante)
+        rb.linearVelocity = Vector2.zero;
+
+        // 6. Aplicamos el impulso
+        rb.AddForce(new Vector2(direccionSalto * wallJumpForce.x, wallJumpForce.y), ForceMode2D.Impulse);
+
+        // 7. Esperamos bloqueados (wallJumpDuration es 0.3f)
+        yield return new WaitForSeconds(wallJumpDuration);
+
+        // 8. Le devolvemos el control
+        isWallJumping = false;
     }
 }

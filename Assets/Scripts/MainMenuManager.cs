@@ -13,7 +13,8 @@ public class MainMenuManager : MonoBehaviour
         else
         {
             // Por si acaso probamos el juego sin música, cargamos normal
-            SceneManager.LoadScene("GameScene");
+            //SceneManager.LoadScene("GameScene");
+            GestorTransiciones.instancia.CargarEscena("GameScene");
         }
     }
 

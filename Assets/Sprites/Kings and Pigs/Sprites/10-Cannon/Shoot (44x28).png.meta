@@ -52,7 +52,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -131,12 +131,12 @@ TextureImporter:
       name: Shoot (44x28)_0
       rect:
         serializedVersion: 2
-        x: 18
-        y: 2
-        width: 23
-        height: 21
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 0
+        width: 44
+        height: 28
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -153,12 +153,12 @@ TextureImporter:
       name: Shoot (44x28)_1
       rect:
         serializedVersion: 2
-        x: 46
-        y: 8
-        width: 15
-        height: 12
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 44
+        y: 0
+        width: 44
+        height: 28
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -175,12 +175,12 @@ TextureImporter:
       name: Shoot (44x28)_2
       rect:
         serializedVersion: 2
-        x: 56
-        y: 3
-        width: 33
-        height: 21
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 88
+        y: 0
+        width: 44
+        height: 28
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -197,12 +197,12 @@ TextureImporter:
       name: Shoot (44x28)_3
       rect:
         serializedVersion: 2
-        x: 89
-        y: 8
-        width: 7
-        height: 12
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 132
+        y: 0
+        width: 44
+        height: 28
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -215,55 +215,11 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: Shoot (44x28)_4
-      rect:
-        serializedVersion: 2
-        x: 94
-        y: 0
-        width: 47
-        height: 28
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: b3bef1a1fa2150b80800000000000000
-      internalID: -8429310584287139013
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Shoot (44x28)_5
-      rect:
-        serializedVersion: 2
-        x: 148
-        y: 2
-        width: 26
-        height: 20
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: c1207f8ee0ddcaff0800000000000000
-      internalID: -23400841935912420
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 887245e44a703bc4a839c9fb62a0f456
     internalID: 0
     vertices: []
     indices: 
@@ -271,14 +227,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":44.0,"y":28.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.0},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":7,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       Shoot (44x28)_0: 5327387930782927702
       Shoot (44x28)_1: -1178982728702096205
       Shoot (44x28)_2: 6160380614089784527
       Shoot (44x28)_3: -1011549835531733501
-      Shoot (44x28)_4: -8429310584287139013
-      Shoot (44x28)_5: -23400841935912420
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

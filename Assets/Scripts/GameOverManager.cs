@@ -45,7 +45,8 @@ public class GameOverManager : MonoBehaviour
         PlayerPrefs.Save();
 
         // 3. Cambiamos de escena
-        SceneManager.LoadScene(nombreDeLaSiguienteEscena);
+        //SceneManager.LoadScene(nombreDeLaSiguienteEscena);
+        GestorTransiciones.instancia.CargarEscena(nombreDeLaSiguienteEscena);
     }
 
     // --- MÉTODOS PARA LOS BOTONES ---

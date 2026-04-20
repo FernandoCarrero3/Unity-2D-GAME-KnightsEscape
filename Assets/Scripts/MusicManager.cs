@@ -45,7 +45,7 @@ public class MusicManager : MonoBehaviour
         audioSource.Stop();
         
         // Cargamos la escena del juego
-        SceneManager.LoadScene(nombreEscena);
+        GestorTransiciones.instancia.CargarEscena(nombreEscena);
 
         // Opcional: Destruimos este MusicManager para que en el juego puedas poner otra música de batalla
         Destroy(gameObject); 
