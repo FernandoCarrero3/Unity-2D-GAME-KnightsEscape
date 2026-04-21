@@ -33,7 +33,6 @@ public class GameOverManager : MonoBehaviour
             nombreJugador = "Caballero Anónimo";
         }
 
-        // Solo guardamos el nombre. El HighscoreManager cogerá esto y los puntos.
         PlayerPrefs.SetString("UltimoNombre", nombreJugador);
         PlayerPrefs.Save();
 

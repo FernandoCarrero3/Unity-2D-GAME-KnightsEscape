@@ -7,7 +7,6 @@ public class TrampaPinchos : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Si lo que cae en los pinchos es el jugador...
         if (collision.CompareTag("Player"))
         {
             PlayerController jugador = collision.GetComponent<PlayerController>();

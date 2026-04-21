@@ -4,7 +4,6 @@ using UnityEngine.SceneManagement;
 
 public class MusicManager : MonoBehaviour
 {
-    // Esta variable estática es el "Singleton" que nos asegura que solo haya 1 reproductor
     public static MusicManager instance;
     private AudioSource audioSource;
 
@@ -24,7 +23,6 @@ public class MusicManager : MonoBehaviour
         }
     }
 
-    // Llamaremos a esta función desde el botón "Jugar"
     public void EmpezarJuegoConFadeOut()
     {
         StartCoroutine(RutinaFadeOut("GameScene"));
@@ -47,7 +45,6 @@ public class MusicManager : MonoBehaviour
         // Cargamos la escena del juego
         GestorTransiciones.instancia.CargarEscena(nombreEscena);
 
-        // Opcional: Destruimos este MusicManager para que en el juego puedas poner otra música de batalla
         Destroy(gameObject); 
     }
 }

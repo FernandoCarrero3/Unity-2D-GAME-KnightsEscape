@@ -24,7 +24,6 @@ public class HighscoreManager : MonoBehaviour
 
     void Start()
     {
-        //PlayerPrefs.SetInt("PuntuacionActual", 0);
         ActualizarTop10();
     }
 
@@ -54,7 +53,7 @@ public class HighscoreManager : MonoBehaviour
             PlayerPrefs.SetInt("PuntuacionActual", -1);
         }
 
-        // 3. ¡LA MAGIA! Ordenar la lista de mayor a menor puntuación
+        // 3. Ordenar la lista de mayor a menor puntuación
         listaRecords.Sort((x, y) => y.puntuacion.CompareTo(x.puntuacion));
 
         // 4. Preparar el texto para la pantalla y guardar el nuevo Top 10

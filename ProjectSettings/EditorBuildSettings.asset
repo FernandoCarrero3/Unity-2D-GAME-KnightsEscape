@@ -23,6 +23,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/VictoryScene.unity
     guid: d1be27196731cc440aa22123ab6cd1cb
+  - enabled: 1
+    path: Assets/Scenes/PantallaTransicion.unity
+    guid: 5500e2b6e6d9efc458f767fc6cc85a04
+  - enabled: 1
+    path: Assets/Scenes/GameScene2.unity
+    guid: ca6b8a156d9d8a64790131ba1713e796
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

@@ -4,9 +4,7 @@ public class Coleccionable : MonoBehaviour
 {
     [Header("Configuración")]
     public int puntos = 100;
-    public GameObject efectoVisualPrefab; // Aquí arrastraremos tu EfectoDiamante_Prefab
-    
-    // Opcional: Sonido
+    public GameObject efectoVisualPrefab;
     public AudioClip sonidoRecoger;
     private bool yaRecogido = false;
 
@@ -32,7 +30,6 @@ public class Coleccionable : MonoBehaviour
             // 3. Reproducir sonido flotante (para que no se corte al destruir el diamante)
             if (sonidoRecoger != null)
             {
-                // Crea un reproductor temporal de audio en la posición del diamante
                 AudioSource.PlayClipAtPoint(sonidoRecoger, transform.position);
             }
 

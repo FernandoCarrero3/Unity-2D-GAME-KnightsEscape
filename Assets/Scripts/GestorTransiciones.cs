@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class GestorTransiciones : MonoBehaviour
 {
-    // Usamos 'instancia' para poder llamar a este script desde cualquier otro sin tener que buscarlo
     public static GestorTransiciones instancia;
 
     [Header("Configuración")]
@@ -23,7 +22,6 @@ public class GestorTransiciones : MonoBehaviour
         StartCoroutine(EfectoFade(1f, 0f));
     }
 
-    // Esta es la función que llamaremos en lugar de SceneManager.LoadScene
     public void CargarEscena(string nombreEscena)
     {
         StartCoroutine(RutinaCargar(nombreEscena));
@@ -31,10 +29,8 @@ public class GestorTransiciones : MonoBehaviour
 
     private IEnumerator RutinaCargar(string nombreEscena)
     {
-        // 1. Oscurecemos la pantalla
         yield return StartCoroutine(EfectoFade(0f, 1f));
 
-        // 2. Cambiamos de escena cuando ya está todo negro
         SceneManager.LoadScene(nombreEscena);
     }
 
@@ -45,8 +41,6 @@ public class GestorTransiciones : MonoBehaviour
 
         while (tiempo < tiempoTransicion)
         {
-            // Usamos unscaledDeltaTime en lugar de deltaTime normal.
-            // ¡Así la transición funciona incluso si el juego está en pausa con Time.timeScale = 0!
             tiempo += Time.unscaledDeltaTime;
 
             float nuevoAlpha = Mathf.Lerp(alphaInicio, alphaFinal, tiempo / tiempoTransicion);
@@ -55,7 +49,6 @@ public class GestorTransiciones : MonoBehaviour
             yield return null;
         }
 
-        // Si terminamos de hacerla transparente, la desactivamos para optimizar
         if (alphaFinal == 0f)
         {
             pantallaNegra.gameObject.SetActive(false);

@@ -6,7 +6,7 @@ public class EnemyAI : MonoBehaviour
     public enum EnemyState { Patrullar, Perseguir, Atacar }
 
     [Header("Comportamiento")]
-    public bool esEstatico = false; // ¡NUEVO! Marca esto en el Inspector para el cerdo del cañón
+    public bool esEstatico = false;
 
     [Header("Estado Actual")]
     public EnemyState currentState = EnemyState.Patrullar;
@@ -64,12 +64,11 @@ public class EnemyAI : MonoBehaviour
     {
         if (player == null) return;
 
-        // ¡LA MAGIA! Si es estático, le obligamos a quedarse quieto y cancelamos el resto del script
         if (esEstatico)
         {
-            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y); // Frena en seco (pero permite caer por gravedad)
-            anim.SetFloat("Speed", 0); // Nos aseguramos de que no haga animación de correr
-            return; // Salimos de la función Update para no procesar radares ni ataques
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            anim.SetFloat("Speed", 0); 
+            return;
         }
 
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
@@ -98,7 +97,6 @@ public class EnemyAI : MonoBehaviour
     {
         rb.linearVelocity = new Vector2((movingRight ? moveSpeed : -moveSpeed), rb.linearVelocity.y);
 
-        // ¡PROTECCIÓN ANTI-ERRORES! Solo busca los radares si de verdad se los hemos asignado en el Inspector
         if (groundCheck != null && wallCheck != null)
         {
             bool isGroundAhead = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
@@ -119,7 +117,6 @@ public class EnemyAI : MonoBehaviour
         if (directionX > 0 && !movingRight) Flip();
         else if (directionX < 0 && movingRight) Flip();
 
-        // ¡PROTECCIÓN ANTI-ERRORES!
         if (groundCheck != null)
         {
             bool isGroundAhead = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);

@@ -9,7 +9,6 @@ public class PauseManager : MonoBehaviour
 
     void Start()
     {
-        // Por si se nos olvida desactivarlo en el Inspector, lo ocultamos al empezar
         panelPausa.SetActive(false);
         // Nos aseguramos de que el tiempo corra a velocidad normal
         Time.timeScale = 1f;
@@ -35,8 +34,7 @@ public class PauseManager : MonoBehaviour
     {
         juegoPausado = true;
         panelPausa.SetActive(true); // Mostramos el cartel de madera
-        
-        // ¡LA MAGIA! Esto congela todas las físicas y animaciones del juego
+
         Time.timeScale = 0f;        
     }
 
@@ -45,14 +43,11 @@ public class PauseManager : MonoBehaviour
         juegoPausado = false;
         panelPausa.SetActive(false); // Ocultamos el cartel
         
-        // ¡LA MAGIA! El tiempo vuelve a correr normal
         Time.timeScale = 1f;         
     }
 
     public void IrAlMenuPrincipal()
     {
-        // ¡SÚPER IMPORTANTE! Hay que descongelar el tiempo antes de irse a otra escena
-        // Si no lo haces, ¡el Menú Principal también estará congelado!
         Time.timeScale = 1f; 
         
         // Guardamos los puntos conseguidos hasta ahora por si acaso

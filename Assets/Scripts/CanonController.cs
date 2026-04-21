@@ -12,9 +12,9 @@ public class CanonController : MonoBehaviour
     public float rangoAltura = 3f;
 
     [Header("El Cerdito Artillero")]
-    public GameObject cerdoArtillero; // Para saber si sigue vivo
-    public Animator animCerdo; // Para activar su animación
-    public float retrasoCerdo = 0.5f; // Tiempo que tarda el cerdo en bajar la cerilla
+    public GameObject cerdoArtillero;
+    public Animator animCerdo;
+    public float retrasoCerdo = 0.5f;
 
     [Header("Tiempos del Cañón")]
     public float tiempoEntreDisparos = 2f;
@@ -63,7 +63,6 @@ public class CanonController : MonoBehaviour
         // 2. Esperamos a que el cerdo baje la cerilla hasta la mecha
         yield return new WaitForSeconds(retrasoCerdo);
 
-        // 3. (Comprobación de seguridad) Si mataste al cerdo justo mientras encendía la mecha, abortamos el disparo
         if (cerdoArtillero == null)
         {
             estaDisparando = false;
@@ -75,7 +74,7 @@ public class CanonController : MonoBehaviour
 
         yield return new WaitForSeconds(retrasoBala);
 
-        // 5. ¡Bum! Disparamos con caída gravitacional
+        // 5. Disparamos con caída gravitacional
         if (balaPrefab != null && puntoDisparo != null)
         {
             Vector2 direccion = (jugador.position - puntoDisparo.position).normalized;

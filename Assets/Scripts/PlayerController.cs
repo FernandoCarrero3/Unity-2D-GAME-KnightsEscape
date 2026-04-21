@@ -40,7 +40,6 @@ public class PlayerController : MonoBehaviour
     private int comboStep = 0;
     private float comboTimer = 0f;
 
-    // --- VARIABLES DE COOLDOWN ---
     public float attackCooldown = 0.4f; // El tiempo que dura la animación del espadazo
     private float nextAttackTime = 0f;  // Cuándo podremos volver a atacar
 
@@ -58,7 +57,6 @@ public class PlayerController : MonoBehaviour
     public LayerMask enemyLayers; // Para saber qué cosas son enemigos
     public int attackDamage = 50; // El daño de la espada
 
-    // Añade esto arriba con el resto de tus variables
     [Header("Efectos de Sonido")]
     public AudioClip sonidoEspada;
     public AudioClip sonidoDaño;
@@ -97,7 +95,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // Detectar si pulsamos el botón de rodar (Shift izquierdo por ejemplo)
+        // Detectar si pulsamos el botón de rodar
         if (Input.GetKeyDown(KeyCode.LeftShift) && canRoll)
         {
             StartCoroutine(RutinaRodar());
@@ -113,7 +111,7 @@ public class PlayerController : MonoBehaviour
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             }
-            else if (isWallSliding) // ¡NUEVO! Si estamos pegados a una pared...
+            else if (isWallSliding)
             {
                 EjecutarWallJump();
             }
@@ -153,12 +151,10 @@ public class PlayerController : MonoBehaviour
             {
                 enemy.GetComponent<EnemyAI>().TakeDamage(attackDamage);
             }
-            // ----------------------------------------
 
             nextAttackTime = Time.time + attackCooldown;
             comboTimer = attackCooldown + 0.5f;
         }
-        // -------------------------
 
         // Girar sprite y las colisiones según dirección
         if (moveInput > 0)
@@ -229,7 +225,7 @@ public class PlayerController : MonoBehaviour
 
         Debug.Log("¡El caballero ha muerto! Saltando a Game Over...");
 
-        // --- NUEVO: Guardar puntos y cambiar de escena ---
+        // --- Guardar puntos y cambiar de escena ---
         if (hudManager != null)
         {
             hudManager.GuardarPuntuacionFinal();
@@ -258,13 +254,12 @@ public class PlayerController : MonoBehaviour
     // --- LÓGICA DEL WALL SLIDE ---
     private bool TocandoPared()
     {
-        // Crea un pequeño círculo en el WallCheck. Si toca la capa 'wallLayer', devuelve true.
         return Physics2D.OverlapCircle(wallCheck.position, 0.3f, wallLayer);
     }
 
     private void ComprobarWallSlide()
     {
-        // Si tocamos pared, NO estamos tocando el suelo, y estamos pulsando hacia los lados...
+        // Si tocamos pared, NO estamos tocando el suelo, y estamos pulsando hacia los lados
         if (TocandoPared() && !isGrounded && Input.GetAxisRaw("Horizontal") != 0)
         {
             if (isWallJumping) return;
@@ -281,10 +276,6 @@ public class PlayerController : MonoBehaviour
             anim.SetBool("WallSlide", false);
         }
     }
-
-    // (Opcional pero recomendado): Si usas una función para saber si tocas el suelo, asegúrate de tenerla.
-    // Suele ser algo así: 
-    // private bool TocandoSuelo() { return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer); }
 
     // --- LÓGICA DE RODAR (ROLL) ---
     private IEnumerator RutinaRodar()
@@ -320,7 +311,7 @@ public class PlayerController : MonoBehaviour
     // Función vacía para evitar el error de la animación de polvo del Asset
     public void AE_SlideDust()
     {
-        // En el futuro podemos poner aquí un código para que salgan partículas
+    
     }
 
     private void EjecutarWallJump()
@@ -338,13 +329,13 @@ public class PlayerController : MonoBehaviour
         // 2. Averiguamos hacia dónde mira ahora mismo
         float direccionX = Mathf.Sign(transform.localScale.x);
 
-        // 3. Saltamos hacia el lado CONTRARIO
+        // 3. Saltamos hacia el lado contrario
         float direccionSalto = -direccionX;
 
         // 4. Giramos al personaje a la fuerza para que mire a donde salta
         transform.localScale = new Vector3(direccionSalto, 1, 1);
 
-        // 5. ¡Vaciamos la velocidad actual antes de empujar! (Súper importante)
+        // 5. Vaciamos la velocidad actual antes de empujar
         rb.linearVelocity = Vector2.zero;
 
         // 6. Aplicamos el impulso

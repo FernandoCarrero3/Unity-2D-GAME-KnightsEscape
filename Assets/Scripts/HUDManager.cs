@@ -9,8 +9,11 @@ public class HUDManager : MonoBehaviour
 
     [Header("Tiempo")]
     public TextMeshProUGUI textoTiempo;
-    private float tiempoJugado = 0f;
-    private bool cronometroActivo = true; // ¡NUEVO! Variable para saber si el tiempo corre
+    private float tiempoActual = 0f;
+    private bool cronometroActivo = true;
+
+    // Variable para saber si estamos en modo contrarreloj
+    private bool esContrarreloj = false;
 
     [Header("Puntuación")]
     public TextMeshProUGUI textoPuntos;
@@ -18,27 +21,68 @@ public class HUDManager : MonoBehaviour
 
     void Start()
     {
-        // ¡NUEVO! Al empezar, miramos si traemos puntos del nivel anterior.
-        // Si acabamos de abrir el juego desde el menú, nos devolverá 0.
         puntosTotales = PlayerPrefs.GetInt("PuntuacionActual", 0);
-
-        // Actualizamos el texto en pantalla nada más empezar
         ActualizarTextoPuntos();
+
+        // Leemos el tiempo que el jugador configuró en Settings
+        int limiteTiempoGuardado = PlayerPrefs.GetInt("TimeLimit", 0);
+
+        if (limiteTiempoGuardado > 0)
+        {
+            // Modo Contrarreloj: Empezamos desde el límite y bajamos
+            esContrarreloj = true;
+            tiempoActual = limiteTiempoGuardado;
+        }
+        else
+        {
+            // Modo Relajado: Empezamos en 0 y subimos
+            esContrarreloj = false;
+            tiempoActual = 0f;
+        }
     }
 
     void Update()
     {
-        // ¡NUEVO! Solo avanza el tiempo si el cronómetro está activo
         if (cronometroActivo)
         {
-            tiempoJugado += Time.deltaTime;
-            int minutos = Mathf.FloorToInt(tiempoJugado / 60);
-            int segundos = Mathf.FloorToInt(tiempoJugado % 60);
+            if (esContrarreloj)
+            {
+                tiempoActual -= Time.deltaTime; // Cuenta atrás
+
+                if (tiempoActual <= 0)
+                {
+                    tiempoActual = 0;
+                    cronometroActivo = false;
+                    TiempoAgotado();
+                }
+            }
+            else
+            {
+                tiempoActual += Time.deltaTime; // Cuenta hacia arriba
+            }
+
+            // Mostrar en formato MM:SS
+            int minutos = Mathf.FloorToInt(tiempoActual / 60);
+            int segundos = Mathf.FloorToInt(tiempoActual % 60);
             textoTiempo.text = string.Format("{0:00}:{1:00}", minutos, segundos);
         }
     }
 
-    // --- NUEVO MÉTODO PARA CONGELAR EL TIEMPO ---
+    private void TiempoAgotado()
+    {
+        Debug.Log("¡Se acabó el tiempo!");
+
+        // Buscamos al jugador en la escena
+        PlayerController jugador = Object.FindFirstObjectByType<PlayerController>();
+
+        if (jugador != null)
+        {
+            // Le aplicamos daño masivo igual que hacen los pinchos
+            // para que muera y salte la pantalla de Game Over
+            jugador.TakeDamage(9999);
+        }
+    }
+
     public void DetenerCronometro()
     {
         cronometroActivo = false;
@@ -57,7 +101,6 @@ public class HUDManager : MonoBehaviour
         ActualizarTextoPuntos();
     }
 
-    // Creamos este pequeño método para no repetir la misma línea de código varias veces
     private void ActualizarTextoPuntos()
     {
         textoPuntos.text = "Puntos: " + puntosTotales.ToString("0000");

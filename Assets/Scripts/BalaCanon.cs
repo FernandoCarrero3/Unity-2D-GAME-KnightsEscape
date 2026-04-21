@@ -3,7 +3,7 @@ using UnityEngine;
 public class BalaCanon : MonoBehaviour
 {
     [Header("Configuración")]
-    public float velocidad = 12f; // Le subimos un poco la velocidad para compensar la gravedad
+    public float velocidad = 12f;
     public int dano = 25;
     public float tiempoDeVida = 3f;
 
