@@ -24,7 +24,7 @@ public class HighscoreManager : MonoBehaviour
 
     void Start()
     {
-        PlayerPrefs.SetInt("PuntuacionActual", 0);
+        //PlayerPrefs.SetInt("PuntuacionActual", 0);
         ActualizarTop10();
     }
 

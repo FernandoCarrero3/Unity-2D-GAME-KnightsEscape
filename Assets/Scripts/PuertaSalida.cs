@@ -8,6 +8,10 @@ public class PuertaSalida : MonoBehaviour
     public int bonusVictoria = 500;
     private bool yaTocado = false;
 
+    // --- NUEVAS VARIABLES PARA DETECTAR LA TECLA ---
+    private bool jugadorEnRango = false;
+    private GameObject jugadorRef; // Guardamos la referencia del jugador para pasársela a la rutina
+
     private Animator anim;
 
     void Start()
@@ -16,13 +20,33 @@ public class PuertaSalida : MonoBehaviour
         anim = GetComponent<Animator>();
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    void Update()
     {
-        // Si entra el jugador y no hemos tocado la puerta...
-        if (collision.CompareTag("Player") && !yaTocado)
+        // Si el jugador está dentro del rango, no ha entrado todavía, y pulsa la FLECHA ARRIBA...
+        if (jugadorEnRango && !yaTocado && Input.GetKeyDown(KeyCode.UpArrow))
         {
             yaTocado = true;
-            StartCoroutine(RutinaVictoria(collision.gameObject));
+            StartCoroutine(RutinaVictoria(jugadorRef));
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        // El jugador entra en la zona de la puerta (pero NO entra al nivel todavía)
+        if (collision.CompareTag("Player") && !yaTocado)
+        {
+            jugadorEnRango = true;
+            jugadorRef = collision.gameObject; // Guardamos al jugador en memoria
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        // Si el jugador se aleja de la puerta sin pulsar la tecla, cancelamos
+        if (collision.CompareTag("Player"))
+        {
+            jugadorEnRango = false;
+            jugadorRef = null; // Borramos la memoria
         }
     }
 
@@ -68,7 +92,6 @@ public class PuertaSalida : MonoBehaviour
         }
 
         // 4. Primero, guardamos los puntos conseguidos jugando (ej: por matar cerdos)
-        // Usamos la misma función que usa el Game Over. (Si tu script no se llama HUDManager, cámbialo).
         HUDManager hud = Object.FindFirstObjectByType<HUDManager>();
         if (hud != null)
         {

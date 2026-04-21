@@ -170,9 +170,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   velocidad: 7
-  dano: 25
-  tiempoDeVida: 3
-  factorCurva: 2
+  dano: 30
+  tiempoDeVida: 4
   capasObstaculos:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 0

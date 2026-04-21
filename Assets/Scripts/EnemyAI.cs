@@ -5,6 +5,9 @@ public class EnemyAI : MonoBehaviour
 {
     public enum EnemyState { Patrullar, Perseguir, Atacar }
 
+    [Header("Comportamiento")]
+    public bool esEstatico = false; // ¡NUEVO! Marca esto en el Inspector para el cerdo del cañón
+
     [Header("Estado Actual")]
     public EnemyState currentState = EnemyState.Patrullar;
 
@@ -33,9 +36,9 @@ public class EnemyAI : MonoBehaviour
     private Animator anim;
 
     [Header("Retroceso (Knockback)")]
-    public float fuerzaGolpeX = 3f; // Fuerza hacia atrás
-    public float fuerzaGolpeY = 4f; // Fuerza del saltito hacia arriba
-    public float tiempoAturdido = 0.3f; // Tiempo que el cerdo no puede moverse
+    public float fuerzaGolpeX = 3f;
+    public float fuerzaGolpeY = 4f;
+    public float tiempoAturdido = 0.3f;
 
     [Header("Salud del Enemigo")]
     public int maxHealth = 100;
@@ -49,23 +52,32 @@ public class EnemyAI : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+
+        GameObject p = GameObject.FindGameObjectWithTag("Player");
+        if (p != null) player = p.transform;
 
         currentHealth = maxHealth;
-
         audioSourceEnemigo = GetComponent<AudioSource>();
     }
 
     void Update()
     {
+        if (player == null) return;
+
+        // ¡LA MAGIA! Si es estático, le obligamos a quedarse quieto y cancelamos el resto del script
+        if (esEstatico)
+        {
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y); // Frena en seco (pero permite caer por gravedad)
+            anim.SetFloat("Speed", 0); // Nos aseguramos de que no haga animación de correr
+            return; // Salimos de la función Update para no procesar radares ni ataques
+        }
+
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
-        // El cerebro de la Máquina de Estados
         if (distanceToPlayer <= attackRadius) currentState = EnemyState.Atacar;
         else if (distanceToPlayer <= visionRadius) currentState = EnemyState.Perseguir;
         else currentState = EnemyState.Patrullar;
 
-        // Ejecutar el comportamiento
         switch (currentState)
         {
             case EnemyState.Patrullar:
@@ -79,8 +91,6 @@ public class EnemyAI : MonoBehaviour
                 break;
         }
 
-        // <-- 3. ACTUALIZAR EL PARÁMETRO SPEED (PARA IDLE/RUN) -->
-        // Usamos Mathf.Abs para saber si se mueve a cualquier lado
         anim.SetFloat("Speed", Mathf.Abs(rb.linearVelocity.x));
     }
 
@@ -88,12 +98,16 @@ public class EnemyAI : MonoBehaviour
     {
         rb.linearVelocity = new Vector2((movingRight ? moveSpeed : -moveSpeed), rb.linearVelocity.y);
 
-        bool isGroundAhead = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
-        bool isWallAhead = Physics2D.OverlapCircle(wallCheck.position, checkRadius, groundLayer);
-
-        if (!isGroundAhead || isWallAhead)
+        // ¡PROTECCIÓN ANTI-ERRORES! Solo busca los radares si de verdad se los hemos asignado en el Inspector
+        if (groundCheck != null && wallCheck != null)
         {
-            Flip();
+            bool isGroundAhead = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
+            bool isWallAhead = Physics2D.OverlapCircle(wallCheck.position, checkRadius, groundLayer);
+
+            if (!isGroundAhead || isWallAhead)
+            {
+                Flip();
+            }
         }
     }
 
@@ -105,8 +119,12 @@ public class EnemyAI : MonoBehaviour
         if (directionX > 0 && !movingRight) Flip();
         else if (directionX < 0 && movingRight) Flip();
 
-        bool isGroundAhead = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
-        if (!isGroundAhead) rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        // ¡PROTECCIÓN ANTI-ERRORES!
+        if (groundCheck != null)
+        {
+            bool isGroundAhead = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
+            if (!isGroundAhead) rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        }
     }
 
     void Flip()
@@ -128,9 +146,7 @@ public class EnemyAI : MonoBehaviour
         if (Time.time >= nextAttackTime)
         {
             anim.SetTrigger("Attack");
-
             player.GetComponent<PlayerController>().TakeDamage(attackDamage);
-
             nextAttackTime = Time.time + attackCooldown;
         }
     }
@@ -139,7 +155,6 @@ public class EnemyAI : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-
         if (yaEstaMuerto) return;
 
         currentHealth -= damage;
@@ -147,7 +162,6 @@ public class EnemyAI : MonoBehaviour
         if (currentHealth > 0)
         {
             anim.SetTrigger("Hit");
-
             StartCoroutine(RutinaRetroceso());
 
             if (audioSourceEnemigo != null && sonidoDañoCerdo != null)
@@ -164,18 +178,10 @@ public class EnemyAI : MonoBehaviour
 
     void Die()
     {
-        Debug.Log("¡El cerdo ha muerto!");
-
-        // Reproduce la animación de morir (trigger "Dead")
         anim.SetTrigger("Dead");
-
         rb.bodyType = RigidbodyType2D.Static;
-        // Desactivamos el collider para que el cadáver no estorbe ni nos empuje
         GetComponent<Collider2D>().enabled = false;
-
         FindObjectOfType<HUDManager>().SumarPuntos(100);
-
-        // Desactivamos este script para que deje de perseguirnos y atacar estando muerto
         this.enabled = false;
     }
 
@@ -186,23 +192,11 @@ public class EnemyAI : MonoBehaviour
 
         if (rb != null && player != null)
         {
-            // 1. Calculamos desde dónde nos ha pegado el jugador
-            // Si el jugador está más a la derecha, el cerdo sale volando a la izquierda (-1), y viceversa.
             float direccion = transform.position.x < player.transform.position.x ? -1f : 1f;
-
-            // 2. Frenamos al cerdo en seco por si venía corriendo
             rb.linearVelocity = Vector2.zero;
-
-            // 3. Le damos el empujón físico hacia atrás y hacia arriba (Impulso)
             rb.AddForce(new Vector2(fuerzaGolpeX * direccion, fuerzaGolpeY), ForceMode2D.Impulse);
-
-            // 4. Pausamos su inteligencia artificial (este mismo script) para que no camine en el aire
             this.enabled = false;
-
-            // 5. Esperamos a que caiga al suelo (aturdido)
             yield return new WaitForSeconds(tiempoAturdido);
-
-            // 6. Le devolvemos la consciencia para que vuelva a atacar
             this.enabled = true;
         }
     }

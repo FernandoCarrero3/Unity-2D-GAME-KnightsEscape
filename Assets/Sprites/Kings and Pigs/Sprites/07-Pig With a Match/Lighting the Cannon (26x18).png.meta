@@ -46,7 +46,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -60,7 +60,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -126,11 +126,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 9
-        width: 6
-        height: 7
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        y: 0
+        width: 26
+        height: 18
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -147,12 +147,12 @@ TextureImporter:
       name: Lighting the Cannon (26x18)_1
       rect:
         serializedVersion: 2
-        x: 2
+        x: 26
         y: 0
-        width: 28
-        height: 17
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 26
+        height: 18
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -169,12 +169,12 @@ TextureImporter:
       name: Lighting the Cannon (26x18)_2
       rect:
         serializedVersion: 2
-        x: 30
+        x: 52
         y: 0
-        width: 23
-        height: 17
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 26
+        height: 18
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -187,33 +187,11 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: Lighting the Cannon (26x18)_3
-      rect:
-        serializedVersion: 2
-        x: 56
-        y: 0
-        width: 22
-        height: 17
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: c06451c464b867880800000000000000
-      internalID: -8613544103259060724
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 217d4b662ed9bcd4eb017a3234d1ae50
     internalID: 0
     vertices: []
     indices: 
@@ -221,12 +199,13 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":26.0,"y":18.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.0},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":7,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       Lighting the Cannon (26x18)_0: -1657784535039530416
       Lighting the Cannon (26x18)_1: 3963528392581243994
       Lighting the Cannon (26x18)_2: 1574708025943414546
-      Lighting the Cannon (26x18)_3: -8613544103259060724
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

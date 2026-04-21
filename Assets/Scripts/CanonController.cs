@@ -8,16 +8,22 @@ public class CanonController : MonoBehaviour
     public Transform puntoDisparo;
 
     [Header("Área de Visión")]
-    public float rangoAdelante = 10f; // Distancia máxima hacia adelante
-    public float rangoAltura = 3f;    // Cuánto te ve hacia arriba/abajo
+    public float rangoAdelante = 10f;
+    public float rangoAltura = 3f;
 
-    [Header("Tiempos")]
+    [Header("El Cerdito Artillero")]
+    public GameObject cerdoArtillero; // Para saber si sigue vivo
+    public Animator animCerdo; // Para activar su animación
+    public float retrasoCerdo = 0.5f; // Tiempo que tarda el cerdo en bajar la cerilla
+
+    [Header("Tiempos del Cañón")]
     public float tiempoEntreDisparos = 2f;
     public float retrasoBala = 0.2f;
 
     private Transform jugador;
     private Animator anim;
     private float proximoDisparo = 0f;
+    private bool estaDisparando = false;
 
     void Start()
     {
@@ -28,18 +34,18 @@ public class CanonController : MonoBehaviour
 
     void Update()
     {
-        if (jugador == null) return;
+        // 1. SI EL CERDO MUERE O NO HAY JUGADOR, EL CAÑÓN DEJA DE FUNCIONAR
+        if (jugador == null || cerdoArtillero == null) return;
 
-        // 1. Averiguamos la distancia en X y en Y por separado
+        // Si ya estamos en medio de un disparo, esperamos
+        if (estaDisparando) return;
+
         float distanciaX = Mathf.Abs(jugador.position.x - transform.position.x);
         float distanciaY = Mathf.Abs(jugador.position.y - transform.position.y);
 
-        // 2. Comprobamos si el jugador está DELANTE del cañón
-        // transform.right.x nos dice hacia dónde apunta el cañón (1 derecha, -1 izquierda)
         float direccionAlJugador = jugador.position.x - transform.position.x;
         bool estaDelante = Mathf.Sign(direccionAlJugador) == Mathf.Sign(transform.right.x);
 
-        // 3. Si está delante, dentro de la distancia X, dentro de la altura Y, y el cañón ha recargado...
         if (estaDelante && distanciaX <= rangoAdelante && distanciaY <= rangoAltura && Time.time >= proximoDisparo)
         {
             StartCoroutine(RutinaDisparo());
@@ -49,24 +55,44 @@ public class CanonController : MonoBehaviour
 
     private IEnumerator RutinaDisparo()
     {
+        estaDisparando = true;
+
+        // 1. Le decimos al cerdo que encienda la mecha
+        if (animCerdo != null) animCerdo.SetTrigger("LightIt");
+
+        // 2. Esperamos a que el cerdo baje la cerilla hasta la mecha
+        yield return new WaitForSeconds(retrasoCerdo);
+
+        // 3. (Comprobación de seguridad) Si mataste al cerdo justo mientras encendía la mecha, abortamos el disparo
+        if (cerdoArtillero == null)
+        {
+            estaDisparando = false;
+            yield break; // Cancela la rutina por completo
+        }
+
+        // 4. El cañón hace su animación de fogonazo
         if (anim != null) anim.SetTrigger("Shoot");
+
         yield return new WaitForSeconds(retrasoBala);
 
+        // 5. ¡Bum! Disparamos con caída gravitacional
         if (balaPrefab != null && puntoDisparo != null)
         {
+            Vector2 direccion = (jugador.position - puntoDisparo.position).normalized;
+            float angulo = Mathf.Atan2(direccion.y, direccion.x) * Mathf.Rad2Deg;
+            puntoDisparo.rotation = Quaternion.Euler(0, 0, angulo);
+
             Instantiate(balaPrefab, puntoDisparo.position, puntoDisparo.rotation);
         }
+
+        estaDisparando = false;
     }
 
-    // Dibujamos la caja de visión en el editor
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        // Calculamos el centro de la caja (la mitad de la distancia hacia adelante)
         Vector3 centroCaja = transform.position + (transform.right * (rangoAdelante / 2f));
-        // Tamaño total de la caja
         Vector3 tamañoCaja = new Vector3(rangoAdelante, rangoAltura * 2f, 0f);
-
         Gizmos.DrawWireCube(centroCaja, tamañoCaja);
     }
 }
