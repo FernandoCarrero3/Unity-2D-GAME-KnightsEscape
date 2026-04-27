@@ -212,7 +212,7 @@ MonoBehaviour:
   chaseSpeed: 3.5
   attackRadius: 0.7
   attackCooldown: 1.5
-  attackDamage: 50
+  attackDamage: 30
   groundCheck: {fileID: 9105600385403908754}
   wallCheck: {fileID: 2819950242203378649}
   checkRadius: 0.1

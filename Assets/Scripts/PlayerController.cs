@@ -149,7 +149,19 @@ public class PlayerController : MonoBehaviour
             // 2. A cada enemigo tocado, le quitamos vida
             foreach (Collider2D enemy in hitEnemies)
             {
-                enemy.GetComponent<EnemyAI>().TakeDamage(attackDamage);
+                // Comprobamos si es un cerdo
+                EnemyAI cerdo = enemy.GetComponent<EnemyAI>();
+                if (cerdo != null)
+                {
+                    cerdo.TakeDamage(attackDamage);
+                }
+
+                // Comprobamos si es el nuevo enemigo volador
+                EnemigoVoladorAI volador = enemy.GetComponent<EnemigoVoladorAI>();
+                if (volador != null)
+                {
+                    volador.TakeDamage(attackDamage);
+                }
             }
 
             nextAttackTime = Time.time + attackCooldown;
@@ -311,7 +323,7 @@ public class PlayerController : MonoBehaviour
     // Función vacía para evitar el error de la animación de polvo del Asset
     public void AE_SlideDust()
     {
-    
+
     }
 
     private void EjecutarWallJump()
