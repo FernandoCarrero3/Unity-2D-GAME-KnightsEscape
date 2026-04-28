@@ -162,6 +162,12 @@ public class PlayerController : MonoBehaviour
                 {
                     volador.TakeDamage(attackDamage);
                 }
+
+                EvilWizardAI mago = enemy.GetComponent<EvilWizardAI>();
+                if (mago != null)
+                {
+                    mago.TakeDamage(attackDamage);
+                }
             }
 
             nextAttackTime = Time.time + attackCooldown;

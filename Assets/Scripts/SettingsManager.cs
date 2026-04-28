@@ -29,8 +29,10 @@ public class SettingsManager : MonoBehaviour
         volumeSlider.value = PlayerPrefs.GetFloat("Volume", 1f);
         healthSlider.value = PlayerPrefs.GetInt("MaxHealth", 150);
 
-        // El tiempo por defecto será 0 (Infinito)
-        timeSlider.value = PlayerPrefs.GetInt("TimeLimit", 0);
+        int tiempoGuardado = PlayerPrefs.GetInt("TimeLimit", 0);
+        timeSlider.value = tiempoGuardado / 60;
+
+
         difficultyIndex = PlayerPrefs.GetInt("DifficultyIndex", 1);
 
         // Pantalla completa (leemos cómo está la pantalla de tu ordenador ahora mismo)
@@ -44,7 +46,7 @@ public class SettingsManager : MonoBehaviour
 
         // 3. Actualizar todos los textos visuales
         UpdateHealthLabel(healthSlider.value);
-        UpdateTimeLabel(timeSlider.value);
+        UpdateTimeLabel(tiempoGuardado);
         UpdateDifficultyLabel();
     }
 
@@ -71,8 +73,13 @@ public class SettingsManager : MonoBehaviour
     // --- TIEMPO LÍMITE ---
     public void OnTimeChanged(float value)
     {
-        int timeLimit = Mathf.RoundToInt(value);
+        // Multiplicamos la posición del slider (0, 1, 2, 3, 4, 5) por 60
+        int timeLimit = Mathf.RoundToInt(value) * 60;
+
+        // Guardamos el valor real (0, 60, 120, 180...)
         PlayerPrefs.SetInt("TimeLimit", timeLimit);
+
+        // Actualizamos el texto de la pantalla
         UpdateTimeLabel(timeLimit);
     }
 
