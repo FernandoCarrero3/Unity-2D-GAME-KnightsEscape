@@ -1,15 +1,15 @@
 using UnityEngine;
-using TMPro; 
+using TMPro;
 using UnityEngine.UI;
 
 public class GameOverManager : MonoBehaviour
 {
     [Header("Elementos de la UI")]
     public TextMeshProUGUI textoPuntuacion;
-    public TMP_InputField inputNombre; 
+    public TMP_InputField inputNombre;
 
-    public RawImage fondoCaptura; 
-    public static Texture2D capturaDePantalla; 
+    public RawImage fondoCaptura;
+    public static Texture2D capturaDePantalla;
 
     private int puntosObtenidos = 0;
 
@@ -41,11 +41,24 @@ public class GameOverManager : MonoBehaviour
 
     public void BotonReiniciar()
     {
-        GuardarRecordYSalir("GameScene");
+
+        string nombreJugador = inputNombre.text;
+        if (string.IsNullOrEmpty(nombreJugador))
+        {
+            nombreJugador = "Caballero Anónimo";
+        }
+        PlayerPrefs.SetString("UltimoNombre", nombreJugador);
+
+
+        PlayerPrefs.SetInt("PuntuacionActual", 0);
+        PlayerPrefs.Save();
+
+
+        GestorTransiciones.instancia.CargarEscena("GameScene");
     }
 
     public void BotonMenuPrincipal()
     {
-        GuardarRecordYSalir("RecordsScene"); 
+        GuardarRecordYSalir("RecordsScene");
     }
 }

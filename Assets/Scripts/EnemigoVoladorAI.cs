@@ -133,7 +133,7 @@ public class EnemigoVoladorAI : MonoBehaviour
 
         if (tocandoSuelo && estadoActual == EstadoVolador.Cayendo)
         {
-            estadoActual = EstadoVolador.EnSuelo; // Cambiamos el estado INMEDIATAMENTE
+            estadoActual = EstadoVolador.EnSuelo;
             StartCoroutine(RutinaRecuperacionSuelo());
         }
     }
@@ -222,7 +222,7 @@ public class EnemigoVoladorAI : MonoBehaviour
         {
             audioSource.PlayOneShot(sonidoGolpe);
         }
-        
+
         rb.bodyType = RigidbodyType2D.Static;
         GetComponent<Collider2D>().enabled = false;
 
@@ -234,17 +234,13 @@ public class EnemigoVoladorAI : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // 1. Comprobamos si hemos chocado contra el jugador y si el enemigo sigue vivo
         if (collision.gameObject.CompareTag("Player") && !yaEstaMuerto)
         {
-            // 2. ¡EL CAMBIO CLAVE! ¿Estaba en estado "Cayendo" en el momento del impacto?
             if (estadoActual == EstadoVolador.Cayendo)
             {
                 // Solo aquí hace daño
                 collision.gameObject.GetComponent<PlayerController>().TakeDamage(attackDamage);
 
-                // Además, forzamos el estado EnSuelo para que no te siga haciendo daño
-                // si te quedas debajo de él
                 estadoActual = EstadoVolador.EnSuelo;
                 StartCoroutine(RutinaRecuperacionSuelo());
             }
